@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eu e ela - Minha Lista</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">Eu e ela</div>
+        <nav class="nav">
+            <a href="index.html">Início</a>
+            <a href="videos.html">Vídeos</a>
+            <a href="bombando.html">Bombando</a>
+            <a href="lista.html" class="active">Minha Lista</a>
+        </nav>
+        <div class="profile-icon">
+            <img src="assets/images/nosso-perfil.jpg" alt="Nossa Foto">
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="category">
+            <h2>❤️ Minha Lista</h2>
+            <div class="gallery" id="minha-lista"></div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const listaContainer = document.getElementById('minha-lista');
+            const minhaLista = JSON.parse(localStorage.getItem('minhaLista')) || [];
+            
+            if (minhaLista.length === 0) {
+                listaContainer.innerHTML = '<p class="empty-message">Sua lista está vazia. Adicione itens clicando em "+ Minha Lista"</p>';
+                return;
+            }
+            
+            minhaLista.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'gallery-item';
+                
+                if (item.isVideo) {
+                    card.innerHTML = `
+                        <img src="${item.thumb || 'assets/images/video-placeholder.jpg'}" alt="${item.title}">
+                        <div class="video-badge">▶ Vídeo</div>
+                    `;
+                } else {
+                    card.innerHTML = `<img src="${item.src}" alt="${item.title}">`;
+                }
+                
+                card.addEventListener('click', () => {
+                    if (item.isVideo) {
+                        openModal(item.src, item.title, true);
+                    } else {
+                        openModal(item.src, item.title);
+                    }
+                });
+                
+                listaContainer.appendChild(card);
+            });
+        });
+    </script>
+</body>
+</html>

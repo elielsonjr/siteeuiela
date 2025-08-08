@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eu e ela - Vídeos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">Eu e ela</div>
+        <nav class="nav">
+            <a href="index.html">Início</a>
+            <a href="videos.html" class="active">Vídeos</a>
+        </nav>
+        <div class="profile-icon">
+            <img src="assets/images/nosso-perfil.jpg" alt="Nossa Foto">
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="category">
+            <h2>🎥 Todos os Nossos Vídeos</h2>
+            <div class="gallery" id="todos-videos"></div>
+        </section>
+    </main>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">×</span>
+            <video id="modal-video" controls style="display: none;">
+                <source src="" type="video/mp4">
+                Seu navegador não suporta vídeos HTML5.
+            </video>
+            <h3 id="modal-title"></h3>
+            <button class="heart-button" onclick="adicionarFavorito()">❤️ Adicionar aos Favoritos</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+            document.addEventListener('DOMContentLoaded', function() {
+        const videosContainer = document.getElementById('todos-videos');
+        
+        mediaConfig.categorias.find(cat => cat.id === "videos").itens.forEach(video => {
+            const card = document.createElement('div');
+            card.className = 'gallery-item';
+            
+            // Placeholder inicial
+            card.innerHTML = `
+                <img src="assets/images/video-placeholder.jpg" alt="${video.title}">
+                <div class="video-badge">▶ ${video.duration}</div>
+                <div class="item-title">${video.title} <small>(${formatarData(video.date)})</small></div>
+            `;
+            
+            // Gera thumbnail dinamicamente
+            generateVideoThumbnail(video.src, (thumbnail) => {
+                const img = card.querySelector('img');
+                img.src = thumbnail;
+            });
+            
+            card.addEventListener('click', () => {
+                openModal(video.src, video.title, true, video.date);
+            });
+            
+            videosContainer.appendChild(card);
+        });
+
+        // Aplica Masonry layout
+        setTimeout(() => {
+            if (typeof Masonry !== 'undefined') {
+                new Masonry('.gallery', {
+                    itemSelector: '.gallery-item',
+                    columnWidth: '.gallery-item',
+                    percentPosition: true,
+                    gutter: 25
+                });
+            }
+        }, 500);
+            function formatarData(data) {
+        if (!(data instanceof Date)) {
+            data = new Date(data);
+        }
+        return data.toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    }
+    });
+    </script>
+</body>
+</html>
