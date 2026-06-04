@@ -3,67 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eu e ela - Minha Lista</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>Eu e Ela - Minha Lista</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+    <!-- FontAwesome for romantic icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <!-- Header fixo Glassmorphic -->
     <header class="header">
-        <div class="logo">Eu e ela</div>
+        <div class="logo">Eu & Ela</div>
         <nav class="nav">
-            <a href="index.html">Início</a>
-            <a href="videos.html">Vídeos</a>
-            <a href="bombando.html">Bombando</a>
-            <a href="lista.html" class="active">Minha Lista</a>
+            <a href="home.html"><i class="fa-solid fa-house"></i> Início</a>
+            <a href="videos.html"><i class="fa-solid fa-video"></i> Vídeos</a>
+            <a href="lista.html" class="active"><i class="fa-solid fa-heart"></i> Minha Lista</a>
         </nav>
         <div class="profile-icon">
-            <img src="assets/images/nosso-perfil.jpg" alt="Nossa Foto">
+            <img src="assets/images/nosso-perfil.jpg" alt="Nossa Foto" onerror="this.src='https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=150&auto=format&fit=crop';">
         </div>
     </header>
 
-    <main class="main-content">
+    <!-- Conteúdo Principal -->
+    <main class="main-content" style="margin-top: 120px;">
         <section class="category">
-            <h2>❤️ Minha Lista</h2>
-            <div class="gallery" id="minha-lista"></div>
+            <div class="category-header">
+                <h2><i class="fa-solid fa-heart"></i> Nossos Momentos Favoritos</h2>
+            </div>
+            <div class="gallery" id="minha-lista">
+                <!-- Inserido dinamicamente via JS -->
+            </div>
         </section>
     </main>
 
+    <!-- Modal Multimídia -->
+    <div id="modal" class="modal">
+        <div class="modal-backdrop" onclick="closeModal()"></div>
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="modal-media-wrapper">
+                <img id="modal-image" src="" alt="Imagem Especial" style="display: none;">
+                <video id="modal-video" style="display: none;" controls>
+                    <source src="" type="video/mp4">
+                    Seu navegador não suporta vídeos HTML5.
+                </video>
+            </div>
+            <div class="modal-info">
+                <h3 id="modal-title"></h3>
+                <div class="modal-actions">
+                    <button class="heart-button" id="fav-btn">
+                        <i class="fa-solid fa-heart-crack"></i> <span id="fav-btn-text">Remover dos Favoritos</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controle de Áudio Flutuante -->
+    <div class="music-controller" id="music-toggle">
+        <div class="music-waves" id="waves">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="music-text" id="music-status">Música: Desativada</div>
+    </div>
+    <audio id="bgMusic" loop>
+        <source src="assets/audio/nossa-musica.m4a" type="audio/mp4">
+        <source src="assets/audio/nossa-musica.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script src="script.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            carregarFavoritos();
+        });
+
+        function carregarFavoritos() {
             const listaContainer = document.getElementById('minha-lista');
+            listaContainer.innerHTML = '';
+            
             const minhaLista = JSON.parse(localStorage.getItem('minhaLista')) || [];
             
             if (minhaLista.length === 0) {
-                listaContainer.innerHTML = '<p class="empty-message">Sua lista está vazia. Adicione itens clicando em "+ Minha Lista"</p>';
+                listaContainer.style.display = 'block';
+                listaContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fa-regular fa-heart"></i></div>
+                        <h3>Sua lista de favoritos está vazia</h3>
+                        <p>Navegue pelo Início ou Vídeos e clique no ícone de coração nos detalhes para salvar seus momentos especiais aqui.</p>
+                        <a href="home.html" class="empty-btn"><i class="fa-solid fa-magnifying-glass"></i> Explorar Momentos</a>
+                    </div>
+                `;
                 return;
             }
+
+            listaContainer.style.display = 'grid';
             
             minhaLista.forEach(item => {
                 const card = document.createElement('div');
-                card.className = 'gallery-item';
+                card.className = 'gallery-item' + (item.isVideo ? ' video-item' : '');
                 
                 if (item.isVideo) {
                     card.innerHTML = `
-                        <img src="${item.thumb || 'assets/images/video-placeholder.jpg'}" alt="${item.title}">
-                        <div class="video-badge">▶ Vídeo</div>
+                        <div class="video-container-wrapper">
+                            <img src="${item.thumb || VIDEO_PLACEHOLDER}" alt="${item.title}" class="video-thumb" loading="lazy">
+                            <div class="video-play-overlay"><i class="fa-solid fa-play"></i></div>
+                            <div class="video-badge"><i class="fa-solid fa-video"></i> Vídeo</div>
+                            <div class="item-title">${item.title}</div>
+                        </div>
                     `;
                 } else {
-                    card.innerHTML = `<img src="${item.src}" alt="${item.title}">`;
+                    card.innerHTML = `
+                        <img src="${item.src}" alt="${item.title}" loading="lazy">
+                        <div class="item-title">${item.title}</div>
+                    `;
                 }
                 
                 card.addEventListener('click', () => {
-                    if (item.isVideo) {
-                        openModal(item.src, item.title, true);
-                    } else {
-                        openModal(item.src, item.title);
-                    }
+                    openModal(item.src, item.title, item.isVideo);
                 });
                 
                 listaContainer.appendChild(card);
             });
-        });
+
+            // Disposição responsiva é cuidada via CSS Columns
+        }
+
+        // Sobrescrever a função do modal fechar para atualizar a tela caso um favorito seja removido
+        const originalCloseModal = window.closeModal;
+        window.closeModal = function() {
+            originalCloseModal();
+            carregarFavoritos(); // Recarrega a galeria se um item foi removido
+        }
     </script>
 </body>
 </html>

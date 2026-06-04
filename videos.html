@@ -3,95 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eu e ela - Vídeos</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <title>Eu e Ela - Vídeos</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
-    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+    <!-- FontAwesome for romantic icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <!-- Header fixo Glassmorphic -->
     <header class="header">
-        <div class="logo">Eu e ela</div>
+        <div class="logo">Eu & Ela</div>
         <nav class="nav">
-            <a href="index.html">Início</a>
-            <a href="videos.html" class="active">Vídeos</a>
+            <a href="home.html"><i class="fa-solid fa-house"></i> Início</a>
+            <a href="videos.html" class="active"><i class="fa-solid fa-video"></i> Vídeos</a>
+            <a href="lista.html"><i class="fa-solid fa-heart"></i> Minha Lista</a>
         </nav>
         <div class="profile-icon">
-            <img src="assets/images/nosso-perfil.jpg" alt="Nossa Foto">
+            <img src="assets/images/nosso-perfil.jpg" alt="Nossa Foto" onerror="this.src='https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=150&auto=format&fit=crop';">
         </div>
     </header>
 
-    <main class="main-content">
+    <!-- Conteúdo Principal -->
+    <main class="main-content" style="margin-top: 120px;">
         <section class="category">
-            <h2>🎥 Todos os Nossos Vídeos</h2>
-            <div class="gallery" id="todos-videos"></div>
+            <div class="category-header">
+                <h2><i class="fa-solid fa-clapperboard"></i> Todos os Nossos Vídeos</h2>
+            </div>
+            <div class="gallery" id="todos-videos">
+                <!-- Inserido dinamicamente via JS -->
+            </div>
         </section>
     </main>
 
-    <!-- Modal -->
+    <!-- Modal Multimídia -->
     <div id="modal" class="modal">
+        <div class="modal-backdrop" onclick="closeModal()"></div>
         <div class="modal-content">
-            <span class="close" onclick="closeModal()">×</span>
-            <video id="modal-video" controls style="display: none;">
-                <source src="" type="video/mp4">
-                Seu navegador não suporta vídeos HTML5.
-            </video>
-            <h3 id="modal-title"></h3>
-            <button class="heart-button" onclick="adicionarFavorito()">❤️ Adicionar aos Favoritos</button>
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="modal-media-wrapper">
+                <img id="modal-image" src="" alt="Imagem Especial" style="display: none;">
+                <video id="modal-video" style="display: none;" controls>
+                    <source src="" type="video/mp4">
+                    Seu navegador não suporta vídeos HTML5.
+                </video>
+            </div>
+            <div class="modal-info">
+                <h3 id="modal-title"></h3>
+                <div class="modal-actions">
+                    <button class="heart-button" id="fav-btn">
+                        <i class="fa-regular fa-heart"></i> <span id="fav-btn-text">Adicionar aos Favoritos</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- Controle de Áudio Flutuante -->
+    <div class="music-controller" id="music-toggle">
+        <div class="music-waves" id="waves">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="music-text" id="music-status">Música: Desativada</div>
+    </div>
+    <audio id="bgMusic" loop>
+        <source src="assets/audio/nossa-musica.m4a" type="audio/mp4">
+        <source src="assets/audio/nossa-musica.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script src="script.js"></script>
     <script>
-            document.addEventListener('DOMContentLoaded', function() {
-        const videosContainer = document.getElementById('todos-videos');
-        
-        mediaConfig.categorias.find(cat => cat.id === "videos").itens.forEach(video => {
-            const card = document.createElement('div');
-            card.className = 'gallery-item';
+        document.addEventListener('DOMContentLoaded', function() {
+            const videosContainer = document.getElementById('todos-videos');
             
-            // Placeholder inicial
-            card.innerHTML = `
-                <img src="assets/images/video-placeholder.jpg" alt="${video.title}">
-                <div class="video-badge">▶ ${video.duration}</div>
-                <div class="item-title">${video.title} <small>(${formatarData(video.date)})</small></div>
-            `;
-            
-            // Gera thumbnail dinamicamente
-            generateVideoThumbnail(video.src, (thumbnail) => {
-                const img = card.querySelector('img');
-                img.src = thumbnail;
-            });
-            
-            card.addEventListener('click', () => {
-                openModal(video.src, video.title, true, video.date);
-            });
-            
-            videosContainer.appendChild(card);
-        });
+            // Garantir que carregamos os vídeos do mediaConfig atualizado no script.js
+            const videoCategory = mediaConfig.categorias.find(cat => cat.id === "videos");
+            if (!videoCategory) return;
 
-        // Aplica Masonry layout
-        setTimeout(() => {
-            if (typeof Masonry !== 'undefined') {
-                new Masonry('.gallery', {
-                    itemSelector: '.gallery-item',
-                    columnWidth: '.gallery-item',
-                    percentPosition: true,
-                    gutter: 25
+            videoCategory.itens.forEach(video => {
+                const card = document.createElement('div');
+                card.className = 'gallery-item video-item';
+                
+                // Placeholder inicial
+                card.innerHTML = `
+                    <div class="video-container-wrapper">
+                        <img src="${VIDEO_PLACEHOLDER}" alt="${video.title}" class="video-thumb" loading="lazy">
+                        <div class="video-play-overlay"><i class="fa-solid fa-play"></i></div>
+                        <div class="video-badge"><i class="fa-solid fa-clock"></i> ${video.duration}</div>
+                        <div class="item-title">${video.title} <small>(${formatarData(video.date)})</small></div>
+                    </div>
+                `;
+                
+                // Gera thumbnail dinamicamente a partir do vídeo
+                generateVideoThumbnail(video.src, (thumbnail) => {
+                    const img = card.querySelector('.video-thumb');
+                    if (img) img.src = thumbnail;
+                });
+                
+                card.addEventListener('click', () => {
+                    openModal(video.src, video.title, true);
+                });
+                
+                videosContainer.appendChild(card);
+            });
+
+            // Disposição dos vídeos é cuidada de forma responsiva via CSS Columns
+
+            function formatarData(data) {
+                if (!(data instanceof Date)) {
+                    data = new Date(data);
+                }
+                return data.toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
                 });
             }
-        }, 500);
-            function formatarData(data) {
-        if (!(data instanceof Date)) {
-            data = new Date(data);
-        }
-        return data.toLocaleDateString('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
         });
-    }
-    });
+    </script>
+    <script>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const data = Array.from(document.querySelectorAll('.gallery-item')).map((el, i) => {
+                    const img = el.querySelector('img');
+                    const wrapper = el.querySelector('.video-container-wrapper');
+                    return `${i}: ${el.querySelector('.item-title').innerText} | offsetHeight: ${el.offsetHeight} | img.offsetHeight: ${img ? img.offsetHeight : 'null'} | wrapper.offsetHeight: ${wrapper ? wrapper.offsetHeight : 'null'}`;
+                }).join('\n');
+                console.log("=== HEIGHTS_REPORT ===");
+                console.log(data);
+                console.log("=== END_HEIGHTS_REPORT ===");
+            }, 3000);
+        });
     </script>
 </body>
 </html>

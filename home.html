@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eu e Ela - Início</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+    <!-- FontAwesome for romantic icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header fixo Glassmorphic -->
+    <header class="header">
+        <div class="logo">Eu & Ela</div>
+        <nav class="nav">
+            <a href="home.html" class="active"><i class="fa-solid fa-house"></i> Início</a>
+            <a href="videos.html"><i class="fa-solid fa-video"></i> Vídeos</a>
+            <a href="lista.html"><i class="fa-solid fa-heart"></i> Minha Lista</a>
+        </nav>
+        <div class="profile-icon">
+            <img src="assets/images/nosso-perfil.jpg" alt="Nossa Foto" onerror="this.src='https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=150&auto=format&fit=crop';">
+        </div>
+    </header>
+
+    <!-- Hero com Timer Premium -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Nosso Amor em Cada Cena</h1>
+            <p class="hero-subtitle">Colecionando os momentos mais felizes das nossas vidas</p>
+            
+            <!-- Grid de Timer elegante -->
+            <div class="timer-container">
+                <div class="timer-title"><i class="fa-solid fa-clock-rotate-left"></i> Juntos Há</div>
+                <div class="timer-grid">
+                    <div class="timer-card">
+                        <span class="timer-num" id="timer-days">00</span>
+                        <span class="timer-label">Dias</span>
+                    </div>
+                    <div class="timer-card">
+                        <span class="timer-num" id="timer-hours">00</span>
+                        <span class="timer-label">Horas</span>
+                    </div>
+                    <div class="timer-card">
+                        <span class="timer-num" id="timer-minutes">00</span>
+                        <span class="timer-label">Min</span>
+                    </div>
+                    <div class="timer-card">
+                        <span class="timer-num" id="timer-seconds">00</span>
+                        <span class="timer-label">Seg</span>
+                    </div>
+                </div>
+                <div class="timer-footer">Desde 24 de Junho de 2024 ❤️</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
+        <!-- Seção de Vídeos (destaque tipo streaming) -->
+        <section class="category">
+            <div class="category-header">
+                <h2><i class="fa-solid fa-clapperboard"></i> Nossos Vídeos em Destaque</h2>
+                <a href="videos.html" class="see-all">Ver todos os vídeos <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+            <div class="gallery-horizontal" id="videos">
+                <!-- Inserido dinamicamente via JS -->
+            </div>
+        </section>
+
+        <!-- Seção de Fotos (Estilo Pinterest Mosaic) -->
+        <section class="category">
+            <div class="category-header">
+                <h2><i class="fa-solid fa-images"></i> Momentos Especiais</h2>
+                <span class="photo-count" id="photo-count-badge">0 fotos</span>
+            </div>
+            <div class="gallery" id="momentos-especiais">
+                <!-- Inserido dinamicamente via JS -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal Multimídia com Transições Suaves -->
+    <div id="modal" class="modal">
+        <div class="modal-backdrop" onclick="closeModal()"></div>
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="modal-media-wrapper">
+                <img id="modal-image" src="" alt="Imagem Especial" style="display: none;">
+                <video id="modal-video" style="display: none;" controls>
+                    <source src="" type="video/mp4">
+                    Seu navegador não suporta vídeos HTML5.
+                </video>
+            </div>
+            <div class="modal-info">
+                <h3 id="modal-title"></h3>
+                <div class="modal-actions">
+                    <button class="heart-button" id="fav-btn">
+                        <i class="fa-regular fa-heart"></i> <span id="fav-btn-text">Adicionar aos Favoritos</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controle de Áudio Flutuante -->
+    <div class="music-controller" id="music-toggle">
+        <div class="music-waves" id="waves">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="music-text" id="music-status">Música: Desativada</div>
+    </div>
+    <audio id="bgMusic" loop>
+        <source src="assets/audio/nossa-musica.m4a" type="audio/mp4">
+        <source src="assets/audio/nossa-musica.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

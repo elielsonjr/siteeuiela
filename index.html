@@ -3,59 +3,451 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eu e ela - Início</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
-    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+    <title>❤️ Um Presente Para Você</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0c0608;
+            --card-bg: rgba(20, 10, 12, 0.65);
+            --primary-color: #ff3366;
+            --primary-glow: rgba(255, 51, 102, 0.4);
+            --text-color: #f5eff1;
+            --text-muted: #b5a9ad;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-color);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-color);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Canvas de corações flutuantes */
+        #canvas-hearts {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Fundo com degradê radial sutil */
+        .bg-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 51, 102, 0.15) 0%, rgba(12, 6, 8, 0) 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Card Surpresa Glassmorphic */
+        .surpresa-box {
+            position: relative;
+            z-index: 10;
+            padding: 45px 35px;
+            border-radius: 24px;
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 51, 102, 0.15);
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 
+                        0 0 40px rgba(255, 51, 102, 0.05);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUpFade 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.3rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 15px;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+
+        h1 span {
+            color: var(--primary-color);
+            text-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        p {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            margin-bottom: 35px;
+            line-height: 1.6;
+        }
+
+        /* Botão Surpresa Premium */
+        #surpresa-btn {
+            position: relative;
+            background: linear-gradient(135deg, #ff3366 0%, #d90429 100%);
+            color: white;
+            border: none;
+            padding: 16px 36px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(217, 4, 41, 0.4), 
+                        0 0 0 0px rgba(255, 51, 102, 0.7);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            overflow: hidden;
+        }
+
+        #surpresa-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 15px 30px rgba(217, 4, 41, 0.5), 
+                        0 0 20px rgba(255, 51, 102, 0.3);
+        }
+
+        #surpresa-btn:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        #surpresa-btn .heart-icon {
+            font-size: 1.2rem;
+            display: inline-block;
+            animation: pulse 1.2s infinite;
+        }
+
+        /* Countdown */
+        #countdown {
+            display: none;
+            font-size: 1.3rem;
+            margin-top: 10px;
+            font-weight: 500;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px var(--primary-glow);
+            animation: pulse 1s infinite alternate;
+        }
+
+        /* Equalizador / Controle de Música Flutuante */
+        .music-controller {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+            background: rgba(20, 10, 12, 0.8);
+            border: 1px solid rgba(255, 51, 102, 0.2);
+            padding: 10px 15px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+
+        .music-controller:hover {
+            opacity: 1;
+            transform: scale(1.05);
+            border-color: var(--primary-color);
+        }
+
+        .music-waves {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 15px;
+            width: 20px;
+        }
+
+        .music-waves span {
+            display: block;
+            width: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+            height: 2px;
+            transition: height 0.2s ease;
+        }
+
+        .music-waves.playing span {
+            animation: soundWave 1.2s infinite ease-in-out;
+        }
+
+        .music-waves.playing span:nth-child(1) { animation-delay: 0.1s; }
+        .music-waves.playing span:nth-child(2) { animation-delay: 0.3s; }
+        .music-waves.playing span:nth-child(3) { animation-delay: 0.6s; }
+        .music-waves.playing span:nth-child(4) { animation-delay: 0.2s; }
+
+        .music-text {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        /* Animações */
+        @keyframes slideUpFade {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.25); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes soundWave {
+            0%, 100% { height: 2px; }
+            50% { height: 15px; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.8rem; }
+            .surpresa-box { padding: 35px 20px; }
+        }
+    </style>
 </head>
 <body>
-    <!-- Header fixo -->
-    <header class="header">
-        <div class="logo">Eu e ela</div>
-        <nav class="nav">
-            <a href="index.html" class="active">Início</a>
-            <a href="videos.html">Vídeos</a>
-        </nav>
-        <div class="profile-icon">
-            <img src="assets/images/nosso-perfil.jpg" alt="Nossa Foto">
-        </div>
-    </header>
+    <div class="bg-glow"></div>
+    <canvas id="canvas-hearts"></canvas>
 
-    <!-- Hero -->
-    <section class="hero">
-        <h1>Nosso Amor em Cada Cena ❤️</h1>
-        <div id="tempo-namoro"></div>
-    </section>
-
-    <!-- Categorias -->
-    <main class="main-content">
-        <section class="category">
-            <h2>📸 Momentos Especiais</h2>
-            <div class="gallery" id="momentos-especiais"></div>
-        </section>
-
-
-        <section class="category">
-            <h2>🎥 Nossos Vídeos</h2>
-            <div class="gallery" id="videos"></div>
-        </section>
-    </main>
-
-    <!-- Modal -->
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">×</span>
-            <img id="modal-image" src="" alt="Imagem Especial" style="display: none;">
-            <video id="modal-video" style="display: none;">
-                <source src="" type="video/mp4">
-                Seu navegador não suporta vídeos HTML5.
-            </video>
-            <h3 id="modal-title"></h3>
-        </div>
+    <div class="surpresa-box">
+        <h1>❤️ Para Você, <br><span>Meu Amor</span> ❤️</h1>
+        <p>Preparei algo especial para relembrarmos nossa história de um jeito lindo...</p>
+        
+        <button id="surpresa-btn">
+            <span>Clique para a Surpresa!</span>
+            <span class="heart-icon">❤️</span>
+        </button>
+        
+        <div id="countdown"></div>
     </div>
 
+    <!-- Controle de Áudio Flutuante -->
+    <div class="music-controller" id="music-toggle">
+        <div class="music-waves" id="waves">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="music-text" id="music-status">Música: Desativada</div>
+    </div>
+
+    <!-- Música de Fundo -->
+    <audio id="bgMusic" loop>
+        <source src="assets/audio/nossa-musica.m4a" type="audio/mp4">
+        <source src="assets/audio/nossa-musica.mp3" type="audio/mpeg">
+    </audio>
+
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script src="script.js"></script>
+    <script>
+        // Configuração do Canvas de Corações Flutuantes
+        const canvas = document.getElementById('canvas-hearts');
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        class HeartParticle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * width;
+                this.y = height + Math.random() * 100 + 20;
+                this.size = Math.random() * 15 + 8;
+                this.speedY = -(Math.random() * 1.5 + 0.5);
+                this.speedX = Math.sin(Math.random() * Math.PI) * 0.4;
+                this.opacity = Math.random() * 0.5 + 0.2;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotationSpeed = (Math.random() - 0.5) * 0.01;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.rotation += this.rotationSpeed;
+                
+                // Diminui opacidade conforme sobe
+                if (this.y < height * 0.7) {
+                    this.opacity -= 0.0015;
+                }
+
+                if (this.y < -50 || this.opacity <= 0) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.globalAlpha = this.opacity;
+                
+                // Desenha coração usando caminhos
+                ctx.beginPath();
+                ctx.fillStyle = `rgba(255, 51, 102, ${this.opacity})`;
+                
+                const d = this.size;
+                ctx.moveTo(0, d / 4);
+                ctx.quadraticCurveTo(0, 0, d / 2, 0);
+                ctx.quadraticCurveTo(d, 0, d, d / 2);
+                ctx.quadraticCurveTo(d, (d * 3) / 4, (d * 3) / 4, d);
+                ctx.lineTo(0, d * 1.4);
+                ctx.lineTo(-(d * 3) / 4, d);
+                ctx.quadraticCurveTo(-d, (d * 3) / 4, -d, d / 2);
+                ctx.quadraticCurveTo(-d, 0, -d / 2, 0);
+                ctx.quadraticCurveTo(0, 0, 0, d / 4);
+                
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        const particles = Array.from({ length: 45 }, () => new HeartParticle());
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Controle de Música
+        const audio = document.getElementById('bgMusic');
+        if (audio) audio.volume = 0.3;
+        const musicToggle = document.getElementById('music-toggle');
+        const waves = document.getElementById('waves');
+        const musicStatus = document.getElementById('music-status');
+        let isMusicPlaying = false;
+
+        function toggleMusic(playForce = null) {
+            const shouldPlay = playForce !== null ? playForce : !isMusicPlaying;
+            
+            if (shouldPlay) {
+                audio.play().then(() => {
+                    isMusicPlaying = true;
+                    waves.classList.add('playing');
+                    musicStatus.innerHTML = "Música: Tocando 🎧";
+                    musicStatus.style.color = "#ff3366";
+                }).catch(e => {
+                    console.log("Reprodução automática bloqueada pelo navegador. Aguardando clique.");
+                });
+            } else {
+                audio.pause();
+                isMusicPlaying = false;
+                waves.classList.remove('playing');
+                musicStatus.innerHTML = "Música: Pausada";
+                musicStatus.style.color = "#b5a9ad";
+            }
+        }
+
+        musicToggle.addEventListener('click', () => toggleMusic());
+
+        // Ação do Botão Surpresa
+        document.getElementById("surpresa-btn").addEventListener("click", function() {
+            this.style.display = "none";
+            const countdownEl = document.getElementById("countdown");
+            countdownEl.style.display = "block";
+            
+            // Inicia música forçadamente no clique (permitido pelos navegadores)
+            toggleMusic(true);
+            
+            // Efeito confete inicial
+            lancarConfetes();
+
+            // Countdown animado com mensagens
+            let count = 3;
+            const mensagens = [
+                "Preparando nossos momentos... ❤️",
+                "Relembrando nossa história... ✨",
+                "Abrindo nosso amor... 🌹",
+                "Começou! 🎉"
+            ];
+            
+            countdownEl.innerHTML = mensagens[0];
+            
+            const timer = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countdownEl.innerHTML = mensagens[3 - count];
+                    // Confetes a cada segundo
+                    lancarConfetes();
+                } else {
+                    clearInterval(timer);
+                    countdownEl.innerHTML = mensagens[3];
+                    
+                    // Confetes massivos antes de ir
+                    const end = Date.now() + 1000;
+                    (function frame() {
+                        confetti({
+                            particleCount: 5,
+                            angle: 60,
+                            spread: 55,
+                            origin: { x: 0 },
+                            colors: ['#ff3366', '#ff758f', '#ffffff']
+                        });
+                        confetti({
+                            particleCount: 5,
+                            angle: 120,
+                            spread: 55,
+                            origin: { x: 1 },
+                            colors: ['#ff3366', '#ff758f', '#ffffff']
+                        });
+                        if (Date.now() < end) {
+                            requestAnimationFrame(frame);
+                        } else {
+                            // Salva no localStorage para a home saber que veio da surpresa
+                            localStorage.setItem('veioDaSurpresa', 'true');
+                            window.location.href = "home.html";
+                        }
+                    }());
+                }
+            }, 1200);
+        });
+
+        function lancarConfetes() {
+            confetti({
+                particleCount: 40,
+                spread: 60,
+                origin: { y: 0.65 },
+                colors: ['#ff3366', '#ff758f', '#d90429', '#ffffff']
+            });
+        }
+    </script>
 </body>
 </html>
